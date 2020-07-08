@@ -1,0 +1,26 @@
+[
+    {
+        "ParameterKey": "VpcStackName",
+        "ParameterValue": "cfAppBaseNetwork"
+    },
+    {
+        "ParameterKey": "AsgInstanceType",
+        "ParameterValue": "t3.medium"
+    },
+    {
+        "ParameterKey": "AsgMinInstances",
+        "ParameterValue": "2"
+    },
+    {
+        "ParameterKey": "AsgMaxInstances",
+        "ParameterValue": "4"
+    },
+    {
+        "ParameterKey": "AsgDesiredInstances",
+        "ParameterValue": "2"
+    },
+    {
+        "ParameterKey": "AsgInstanceAmiId",
+        "ParameterValue": "ami-0c3e74fa87d2a4227"
+    }
+]

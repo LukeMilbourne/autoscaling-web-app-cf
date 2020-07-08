@@ -1,0 +1,236 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "",
+    "Parameters": {
+        "VpcStackName": {
+            "Type": "String",
+            "Description": "Name of VPC CloudFormation Stack"
+        },
+        "AsgInstanceType": {
+            "Type": "String",
+            "Description": "Instance Type for ASG"
+        },
+        "AsgMinInstances": {
+            "Type": "Number",
+            "Description": "Minimum number of instances for ASG"
+        },
+        "AsgMaxInstances": {
+            "Type": "Number",
+            "Description": "Maximum number of instances for ASG"
+        },
+        "AsgDesiredInstances": {
+            "Type": "Number",
+            "Description": "Desired number of instances for ASG"
+        },
+        "AsgInstanceAmiId": {
+            "Type": "String",
+            "Description": "Base AMI ID for instances launched in ASG"
+        }
+    },
+    "Resources": {
+        "AlbSecurityGroup": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "GroupDescription": "-",
+                "SecurityGroupIngress": [
+                    {
+                        "CidrIp": "0.0.0.0/0",
+                        "FromPort": 80,
+                        "ToPort": 80,
+                        "IpProtocol": "tcp"
+                    }
+                ],
+                "VpcId": {
+                    "Fn::ImportValue": {
+                        "Fn::Sub": "${VpcStackName}-VpcId"
+                    }
+                },
+                "Tags": []
+            }
+        },
+        "Alb": {
+            "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
+            "Properties": {
+                "Scheme": "internet-facing",
+                "Type": "application",
+                "SecurityGroups": [
+                    {
+                        "Ref": "AlbSecurityGroup"
+                    }
+                ],
+                "Subnets": [
+                    {
+                        "Fn::ImportValue": {
+                            "Fn::Sub": "${VpcStackName}-ExtLbSubnetAId"
+                        }
+                    },
+                    {
+                        "Fn::ImportValue": {
+                            "Fn::Sub": "${VpcStackName}-ExtLbSubnetBId"
+                        }
+                    }
+                ],
+                "Tags": []
+            }
+        },
+        "AsgSecurityGroup": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "GroupDescription": "-",
+                "SecurityGroupIngress": [
+                    {
+                        "SourceSecurityGroupId": {
+                            "Ref": "AlbSecurityGroup"
+                        },
+                        "FromPort": 80,
+                        "ToPort": 80,
+                        "IpProtocol": "tcp"
+                    }
+                ],
+                "VpcId": {
+                    "Fn::ImportValue": {
+                        "Fn::Sub": "${VpcStackName}-VpcId"
+                    }
+                },
+                "Tags": []
+            }
+        },
+        "AsgIamRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": {
+                        "Effect": "Allow",
+                        "Principal": {
+                            "Service": "ec2.amazonaws.com"
+                        },
+                        "Action": "sts:AssumeRole"
+                    }
+                },
+                "ManagedPolicyArns": [
+                    "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+                ],
+                "Path": "/",
+                "Tags": []
+            }
+        },
+        "AsgLaunchConfigIamProfile": {
+            "Type": "AWS::IAM::InstanceProfile",
+            "Properties": {
+                "Path": "/",
+                "Roles": [
+                    {
+                        "Ref": "AsgIamRole"
+                    }
+                ]
+            }
+        },
+        "AsgLaunchConfiguration": {
+            "Type": "AWS::AutoScaling::LaunchConfiguration",
+            "Properties": {
+                "ImageId": {
+                    "Ref": "AsgInstanceAmiId"
+                },
+                "InstanceType": {
+                    "Ref": "AsgInstanceType"
+                },
+                "IamInstanceProfile": {
+                    "Ref": "AsgLaunchConfigIamProfile"
+                },
+                "SecurityGroups": [
+                    {
+                        "Ref": "AsgSecurityGroup"
+                    }
+                ],
+                "UserData": {
+                    "Fn::Base64" : {
+                        "Fn::Join" : [ "\n", [
+                            "#!/bin/bash -xe",
+                            "yum update -y",
+                            "amazon-linux-extras install nginx1 -y",
+                            "echo \"<html><body><h2>Hello World! From $(curl -s http://169.254.169.254/latest/meta-data/local-hostname)</h2></body></html>\" > /tmp/index.html",
+                            "rm /usr/share/nginx/html/index.html",
+                            "cp /tmp/index.html /usr/share/nginx/html/index.html",
+                            "service nginx restart"
+                            ]]
+                    }
+                }
+            }
+        },
+        "Asg": {
+            "Type": "AWS::AutoScaling::AutoScalingGroup",
+            "Properties": {
+                "VPCZoneIdentifier": [
+                    {
+                        "Fn::ImportValue": {
+                            "Fn::Sub": "${VpcStackName}-WebSubnetAId"
+                        }
+                    },
+                    {
+                        "Fn::ImportValue": {
+                            "Fn::Sub": "${VpcStackName}-WebSubnetBId"
+                        }
+                    }
+                ],
+                "HealthCheckType": "ELB",
+                "HealthCheckGracePeriod": 30,
+                "LaunchConfigurationName": {
+                    "Ref": "AsgLaunchConfiguration"
+                },
+                "MinSize": {
+                    "Ref": "AsgMinInstances"
+                },
+                "MaxSize": {
+                    "Ref": "AsgMaxInstances"
+                },
+                "TargetGroupARNs": [
+                    {
+                        "Ref": "AsgTargetGroup"
+                    }
+                ]
+            }
+        },
+        "AsgTargetGroup": {
+            "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+            "Properties": {
+                "Port": 80,
+                "Protocol": "HTTP",
+                "TargetType": "instance",
+                "VpcId": {
+                    "Fn::ImportValue": {
+                        "Fn::Sub": "${VpcStackName}-VpcId"
+                    }
+                },
+                "HealthCheckEnabled": true,
+                "HealthCheckIntervalSeconds": 30,
+                "HealthCheckPath": "/",
+                "HealthCheckPort": "80",
+                "HealthCheckProtocol": "HTTP",
+                "HealthCheckTimeoutSeconds": "5",
+                "HealthyThresholdCount": 3,
+                "UnhealthyThresholdCount": 5,
+                "Tags": []
+            }
+        },
+        "AlbListener": {
+            "Type": "AWS::ElasticLoadBalancingV2::Listener",
+            "Properties": {
+                "LoadBalancerArn": {
+                    "Ref": "Alb"
+                },
+                "Port": 80,
+                "Protocol": "HTTP",
+                "DefaultActions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {
+                            "Ref": "AsgTargetGroup"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    "Outputs": {}
+}

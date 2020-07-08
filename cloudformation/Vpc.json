@@ -73,7 +73,12 @@
                 "CidrBlock": {
                     "Ref": "VpcCidr"
                 },
-                "Tags": []
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {"Fn::Sub": "${AWS::StackName}-Vpc"}
+                    }
+                ]
             }
         },
         "DmzSubnetA": {
@@ -88,7 +93,12 @@
                 "CidrBlock": {
                     "Ref": "DmzSubnetACidr"
                 },
-                "Tags": []
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {"Fn::Sub": "${AWS::StackName}-DmzSubnetA"}
+                    }
+                ]
             }
         },
         "DmzSubnetB": {
@@ -103,7 +113,12 @@
                 "CidrBlock": {
                     "Ref": "DmzSubnetBCidr"
                 },
-                "Tags": []
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {"Fn::Sub": "${AWS::StackName}-DmzSubnetB"}
+                    }
+                ]
             }
         },
         "ExtLbSubnetA": {
@@ -118,7 +133,12 @@
                 "CidrBlock": {
                     "Ref": "ExtLbSubnetACidr"
                 },
-                "Tags": []
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {"Fn::Sub": "${AWS::StackName}-ExtLbSubnetA"}
+                    }
+                ]
             }
         },
         "ExtLbSubnetB": {
@@ -133,7 +153,12 @@
                 "CidrBlock": {
                     "Ref": "ExtLbSubnetBCidr"
                 },
-                "Tags": []
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {"Fn::Sub": "${AWS::StackName}-ExtLbSubnetB"}
+                    }
+                ]
             }
         },
         "WebSubnetA": {
@@ -148,7 +173,12 @@
                 "CidrBlock": {
                     "Ref": "WebSubnetACidr"
                 },
-                "Tags": []
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {"Fn::Sub": "${AWS::StackName}-WebSubnetA"}
+                    }
+                ]
             }
         },
         "WebSubnetB": {
@@ -163,7 +193,12 @@
                 "CidrBlock": {
                     "Ref": "WebSubnetBCidr"
                 },
-                "Tags": []
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {"Fn::Sub": "${AWS::StackName}-WebSubnetB"}
+                    }
+                ]
             }
         },
         "AppSubnetA": {
@@ -178,7 +213,12 @@
                 "CidrBlock": {
                     "Ref": "AppSubnetACidr"
                 },
-                "Tags": []
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {"Fn::Sub": "${AWS::StackName}-AppSubnetA"}
+                    }
+                ]
             }
         },
         "AppSubnetB": {
@@ -193,7 +233,12 @@
                 "CidrBlock": {
                     "Ref": "AppSubnetBCidr"
                 },
-                "Tags": []
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {"Fn::Sub": "${AWS::StackName}-AppSubnetB"}
+                    }
+                ]
             }
         },
         "DataSubnetA": {
@@ -208,7 +253,12 @@
                 "CidrBlock": {
                     "Ref": "DataSubnetACidr"
                 },
-                "Tags": []
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {"Fn::Sub": "${AWS::StackName}-DataSubnetA"}
+                    }
+                ]
             }
         },
         "DataSubnetB": {
@@ -223,7 +273,12 @@
                 "CidrBlock": {
                     "Ref": "DataSubnetBCidr"
                 },
-                "Tags": []
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {"Fn::Sub": "${AWS::StackName}-DataSubnetB"}
+                    }
+                ]
             }
         },
         "RouteTablePublicA": {
@@ -232,7 +287,12 @@
                 "VpcId": {
                     "Ref": "Vpc"
                 },
-                "Tags": []
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {"Fn::Sub": "${AWS::StackName}-RouteTablePublicA"}
+                    }
+                ]
             }
         },
         "RouteTablePublicB": {
@@ -241,7 +301,12 @@
                 "VpcId": {
                     "Ref": "Vpc"
                 },
-                "Tags": []
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {"Fn::Sub": "${AWS::StackName}-RouteTablePublicB"}
+                    }
+                ]
             }
         },
         "RouteTablePrivateA": {
@@ -250,7 +315,12 @@
                 "VpcId": {
                     "Ref": "Vpc"
                 },
-                "Tags": []
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {"Fn::Sub": "${AWS::StackName}-RouteTablePrivateA"}
+                    }
+                ]
             }
         },
         "RouteTablePrivateB": {
@@ -259,14 +329,19 @@
                 "VpcId": {
                     "Ref": "Vpc"
                 },
-                "Tags": []
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {"Fn::Sub": "${AWS::StackName}-RouteTablePrivateB"}
+                    }
+                ]
             }
         },
         "RouteTableAssocPublicADmzSubnetA": {
             "Type": "AWS::EC2::SubnetRouteTableAssociation",
             "Properties": {
                 "SubnetId": {
-                    "Ref": "ExtLbSubnetA"
+                    "Ref": "DmzSubnetA"
                 },
                 "RouteTableId": {
                     "Ref": "RouteTablePublicA"
@@ -277,7 +352,7 @@
             "Type": "AWS::EC2::SubnetRouteTableAssociation",
             "Properties": {
                 "SubnetId": {
-                    "Ref": "ExtLbSubnetB"
+                    "Ref": "DmzSubnetB"
                 },
                 "RouteTableId": {
                     "Ref": "RouteTablePublicB"
@@ -332,7 +407,7 @@
             "Type": "AWS::EC2::SubnetRouteTableAssociation",
             "Properties": {
                 "SubnetId": {
-                    "Ref": "WebSubnetA"
+                    "Ref": "AppSubnetA"
                 },
                 "RouteTableId": {
                     "Ref": "RouteTablePrivateA"
@@ -343,7 +418,7 @@
             "Type": "AWS::EC2::SubnetRouteTableAssociation",
             "Properties": {
                 "SubnetId": {
-                    "Ref": "WebSubnetB"
+                    "Ref": "AppSubnetB"
                 },
                 "RouteTableId": {
                     "Ref": "RouteTablePrivateB"
@@ -354,7 +429,7 @@
             "Type": "AWS::EC2::SubnetRouteTableAssociation",
             "Properties": {
                 "SubnetId": {
-                    "Ref": "WebSubnetA"
+                    "Ref": "DataSubnetA"
                 },
                 "RouteTableId": {
                     "Ref": "RouteTablePrivateA"
@@ -365,7 +440,7 @@
             "Type": "AWS::EC2::SubnetRouteTableAssociation",
             "Properties": {
                 "SubnetId": {
-                    "Ref": "WebSubnetB"
+                    "Ref": "DataSubnetB"
                 },
                 "RouteTableId": {
                     "Ref": "RouteTablePrivateB"
@@ -443,7 +518,12 @@
             "Type": "AWS::EC2::EIP",
             "Properties": {
                 "Domain": "vpc",
-                "Tags": []
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {"Fn::Sub": "${AWS::StackName}-NatGatewayAEip"}
+                    }
+                ]
             }
         },
         "NatGatewayA": {
@@ -458,14 +538,24 @@
                 "SubnetId": {
                     "Ref": "DmzSubnetA"
                 },
-                "Tags": []
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {"Fn::Sub": "${AWS::StackName}-NatGatewayA"}
+                    }
+                ]
             }
         },
         "NatZoneBEip": {
             "Type": "AWS::EC2::EIP",
             "Properties": {
                 "Domain": "vpc",
-                "Tags": []
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {"Fn::Sub": "${AWS::StackName}-NatGatewayBEip"}
+                    }
+                ]
             }
         },
         "NatGatewayB": {
@@ -480,7 +570,12 @@
                 "SubnetId": {
                     "Ref": "DmzSubnetB"
                 },
-                "Tags": []
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {"Fn::Sub": "${AWS::StackName}-NatGatewayB"}
+                    }
+                ]
             }
         },
         "VpcFlowLogsIamRole": {
