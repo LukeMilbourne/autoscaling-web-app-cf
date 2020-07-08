@@ -1,0 +1,625 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "",
+    "Parameters": {
+        "VpcCidr": {
+            "Description": "CIDR Range for VPC",
+            "Type": "String",
+            "AllowedPattern": "^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}/\\d{1,2}$"
+        },
+        "DmzSubnetACidr": {
+            "Description": "CIDR Range for DMZ subnet in AZ A",
+            "Type": "String",
+            "AllowedPattern": "^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}/\\d{1,2}$"
+        },
+        "DmzSubnetBCidr": {
+            "Description": "CIDR Range for DMZ subnet in AZ B",
+            "Type": "String",
+            "AllowedPattern": "^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}/\\d{1,2}$"
+        },
+        "ExtLbSubnetACidr": {
+            "Description": "CIDR Range for external load balancer subnet in AZ A",
+            "Type": "String",
+            "AllowedPattern": "^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}/\\d{1,2}$"
+        },
+        "ExtLbSubnetBCidr": {
+            "Description": "CIDR Range for external load balancer subnet in AZ B",
+            "Type": "String",
+            "AllowedPattern": "^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}/\\d{1,2}$"
+        },
+        "WebSubnetACidr": {
+            "Description": "CIDR Range for web subnet in AZ A",
+            "Type": "String",
+            "AllowedPattern": "^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}/\\d{1,2}$"
+        },
+        "WebSubnetBCidr": {
+            "Description": "CIDR Range for web subnet in AZ B",
+            "Type": "String",
+            "AllowedPattern": "^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}/\\d{1,2}$"
+        },
+        "AppSubnetACidr": {
+            "Description": "CIDR Range for application subnet in AZ A",
+            "Type": "String",
+            "AllowedPattern": "^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}/\\d{1,2}$"
+        },
+        "AppSubnetBCidr": {
+            "Description": "CIDR Range for application subnet in AZ B",
+            "Type": "String",
+            "AllowedPattern": "^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}/\\d{1,2}$"
+        },
+        "DataSubnetACidr": {
+            "Description": "CIDR Range for data subnet in AZ A",
+            "Type": "String",
+            "AllowedPattern": "^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}/\\d{1,2}$"
+        },
+        "DataSubnetBCidr": {
+            "Description": "CIDR Range for data subnet in AZ B",
+            "Type": "String",
+            "AllowedPattern": "^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}/\\d{1,2}$"
+        },
+        "AvailabilityZoneA": {
+            "Description": "Availability Zone A Name",
+            "Type": "AWS::EC2::AvailabilityZone::Name"
+        },
+        "AvailabilityZoneB": {
+            "Description": "Availability Zone B Name",
+            "Type": "AWS::EC2::AvailabilityZone::Name"
+        }
+    },
+    "Resources": {
+        "Vpc": {
+            "Type": "AWS::EC2::VPC",
+            "Properties": {
+                "CidrBlock": {
+                    "Ref": "VpcCidr"
+                },
+                "Tags": []
+            }
+        },
+        "DmzSubnetA": {
+            "Type": "AWS::EC2::Subnet",
+            "Properties": {
+                "AvailabilityZone": {
+                    "Ref": "AvailabilityZoneA"
+                },
+                "VpcId": {
+                    "Ref": "Vpc"
+                },
+                "CidrBlock": {
+                    "Ref": "DmzSubnetACidr"
+                },
+                "Tags": []
+            }
+        },
+        "DmzSubnetB": {
+            "Type": "AWS::EC2::Subnet",
+            "Properties": {
+                "AvailabilityZone": {
+                    "Ref": "AvailabilityZoneB"
+                },
+                "VpcId": {
+                    "Ref": "Vpc"
+                },
+                "CidrBlock": {
+                    "Ref": "DmzSubnetBCidr"
+                },
+                "Tags": []
+            }
+        },
+        "ExtLbSubnetA": {
+            "Type": "AWS::EC2::Subnet",
+            "Properties": {
+                "AvailabilityZone": {
+                    "Ref": "AvailabilityZoneA"
+                },
+                "VpcId": {
+                    "Ref": "Vpc"
+                },
+                "CidrBlock": {
+                    "Ref": "ExtLbSubnetACidr"
+                },
+                "Tags": []
+            }
+        },
+        "ExtLbSubnetB": {
+            "Type": "AWS::EC2::Subnet",
+            "Properties": {
+                "AvailabilityZone": {
+                    "Ref": "AvailabilityZoneB"
+                },
+                "VpcId": {
+                    "Ref": "Vpc"
+                },
+                "CidrBlock": {
+                    "Ref": "ExtLbSubnetBCidr"
+                },
+                "Tags": []
+            }
+        },
+        "WebSubnetA": {
+            "Type": "AWS::EC2::Subnet",
+            "Properties": {
+                "AvailabilityZone": {
+                    "Ref": "AvailabilityZoneA"
+                },
+                "VpcId": {
+                    "Ref": "Vpc"
+                },
+                "CidrBlock": {
+                    "Ref": "WebSubnetACidr"
+                },
+                "Tags": []
+            }
+        },
+        "WebSubnetB": {
+            "Type": "AWS::EC2::Subnet",
+            "Properties": {
+                "AvailabilityZone": {
+                    "Ref": "AvailabilityZoneB"
+                },
+                "VpcId": {
+                    "Ref": "Vpc"
+                },
+                "CidrBlock": {
+                    "Ref": "WebSubnetBCidr"
+                },
+                "Tags": []
+            }
+        },
+        "AppSubnetA": {
+            "Type": "AWS::EC2::Subnet",
+            "Properties": {
+                "AvailabilityZone": {
+                    "Ref": "AvailabilityZoneA"
+                },
+                "VpcId": {
+                    "Ref": "Vpc"
+                },
+                "CidrBlock": {
+                    "Ref": "AppSubnetACidr"
+                },
+                "Tags": []
+            }
+        },
+        "AppSubnetB": {
+            "Type": "AWS::EC2::Subnet",
+            "Properties": {
+                "AvailabilityZone": {
+                    "Ref": "AvailabilityZoneB"
+                },
+                "VpcId": {
+                    "Ref": "Vpc"
+                },
+                "CidrBlock": {
+                    "Ref": "AppSubnetBCidr"
+                },
+                "Tags": []
+            }
+        },
+        "DataSubnetA": {
+            "Type": "AWS::EC2::Subnet",
+            "Properties": {
+                "AvailabilityZone": {
+                    "Ref": "AvailabilityZoneA"
+                },
+                "VpcId": {
+                    "Ref": "Vpc"
+                },
+                "CidrBlock": {
+                    "Ref": "DataSubnetACidr"
+                },
+                "Tags": []
+            }
+        },
+        "DataSubnetB": {
+            "Type": "AWS::EC2::Subnet",
+            "Properties": {
+                "AvailabilityZone": {
+                    "Ref": "AvailabilityZoneB"
+                },
+                "VpcId": {
+                    "Ref": "Vpc"
+                },
+                "CidrBlock": {
+                    "Ref": "DataSubnetBCidr"
+                },
+                "Tags": []
+            }
+        },
+        "RouteTablePublicA": {
+            "Type": "AWS::EC2::RouteTable",
+            "Properties": {
+                "VpcId": {
+                    "Ref": "Vpc"
+                },
+                "Tags": []
+            }
+        },
+        "RouteTablePublicB": {
+            "Type": "AWS::EC2::RouteTable",
+            "Properties": {
+                "VpcId": {
+                    "Ref": "Vpc"
+                },
+                "Tags": []
+            }
+        },
+        "RouteTablePrivateA": {
+            "Type": "AWS::EC2::RouteTable",
+            "Properties": {
+                "VpcId": {
+                    "Ref": "Vpc"
+                },
+                "Tags": []
+            }
+        },
+        "RouteTablePrivateB": {
+            "Type": "AWS::EC2::RouteTable",
+            "Properties": {
+                "VpcId": {
+                    "Ref": "Vpc"
+                },
+                "Tags": []
+            }
+        },
+        "RouteTableAssocPublicADmzSubnetA": {
+            "Type": "AWS::EC2::SubnetRouteTableAssociation",
+            "Properties": {
+                "SubnetId": {
+                    "Ref": "ExtLbSubnetA"
+                },
+                "RouteTableId": {
+                    "Ref": "RouteTablePublicA"
+                }
+            }
+        },
+        "RouteTableAssocPublicBDmzSubnetB": {
+            "Type": "AWS::EC2::SubnetRouteTableAssociation",
+            "Properties": {
+                "SubnetId": {
+                    "Ref": "ExtLbSubnetB"
+                },
+                "RouteTableId": {
+                    "Ref": "RouteTablePublicB"
+                }
+            }
+        },
+        "RouteTableAssocPublicAExtLbSubnetA": {
+            "Type": "AWS::EC2::SubnetRouteTableAssociation",
+            "Properties": {
+                "SubnetId": {
+                    "Ref": "ExtLbSubnetA"
+                },
+                "RouteTableId": {
+                    "Ref": "RouteTablePublicA"
+                }
+            }
+        },
+        "RouteTableAssocPublicBExtLbSubnetB": {
+            "Type": "AWS::EC2::SubnetRouteTableAssociation",
+            "Properties": {
+                "SubnetId": {
+                    "Ref": "ExtLbSubnetB"
+                },
+                "RouteTableId": {
+                    "Ref": "RouteTablePublicB"
+                }
+            }
+        },
+        "RouteTableAssocPrivateAWebSubnetA": {
+            "Type": "AWS::EC2::SubnetRouteTableAssociation",
+            "Properties": {
+                "SubnetId": {
+                    "Ref": "WebSubnetA"
+                },
+                "RouteTableId": {
+                    "Ref": "RouteTablePrivateA"
+                }
+            }
+        },
+        "RouteTableAssocPrivateAWebSubnetB": {
+            "Type": "AWS::EC2::SubnetRouteTableAssociation",
+            "Properties": {
+                "SubnetId": {
+                    "Ref": "WebSubnetB"
+                },
+                "RouteTableId": {
+                    "Ref": "RouteTablePrivateB"
+                }
+            }
+        },
+        "RouteTableAssocPrivateAAppSubnetA": {
+            "Type": "AWS::EC2::SubnetRouteTableAssociation",
+            "Properties": {
+                "SubnetId": {
+                    "Ref": "WebSubnetA"
+                },
+                "RouteTableId": {
+                    "Ref": "RouteTablePrivateA"
+                }
+            }
+        },
+        "RouteTableAssocPrivateAAppSubnetB": {
+            "Type": "AWS::EC2::SubnetRouteTableAssociation",
+            "Properties": {
+                "SubnetId": {
+                    "Ref": "WebSubnetB"
+                },
+                "RouteTableId": {
+                    "Ref": "RouteTablePrivateB"
+                }
+            }
+        },
+        "RouteTableAssocPrivateADataSubnetA": {
+            "Type": "AWS::EC2::SubnetRouteTableAssociation",
+            "Properties": {
+                "SubnetId": {
+                    "Ref": "WebSubnetA"
+                },
+                "RouteTableId": {
+                    "Ref": "RouteTablePrivateA"
+                }
+            }
+        },
+        "RouteTableAssocPrivateADataSubnetB": {
+            "Type": "AWS::EC2::SubnetRouteTableAssociation",
+            "Properties": {
+                "SubnetId": {
+                    "Ref": "WebSubnetB"
+                },
+                "RouteTableId": {
+                    "Ref": "RouteTablePrivateB"
+                }
+            }
+        },
+        "RouteTablePublicADefaultRoute": {
+            "Type": "AWS::EC2::Route",
+            "DependsOn": "AttachInternetGateway",
+            "Properties": {
+                "RouteTableId": {
+                    "Ref": "RouteTablePublicA"
+                },
+                "DestinationCidrBlock": "0.0.0.0/0",
+                "GatewayId": {
+                    "Ref": "InternetGateway"
+                }
+            }
+        },
+        "RouteTablePublicBDefaultRoute": {
+            "Type": "AWS::EC2::Route",
+            "DependsOn": "AttachInternetGateway",
+            "Properties": {
+                "RouteTableId": {
+                    "Ref": "RouteTablePublicB"
+                },
+                "DestinationCidrBlock": "0.0.0.0/0",
+                "GatewayId": {
+                    "Ref": "InternetGateway"
+                }
+            }
+        },
+        "RouteTablePrivateADefaultRoute": {
+            "Type": "AWS::EC2::Route",
+            "Properties": {
+                "RouteTableId": {
+                    "Ref": "RouteTablePrivateA"
+                },
+                "DestinationCidrBlock": "0.0.0.0/0",
+                "NatGatewayId": {
+                    "Ref": "NatGatewayA"
+                }
+            }
+        },
+        "RouteTablePrivateBDefaultRoute": {
+            "Type": "AWS::EC2::Route",
+            "Properties": {
+                "RouteTableId": {
+                    "Ref": "RouteTablePrivateB"
+                },
+                "DestinationCidrBlock": "0.0.0.0/0",
+                "NatGatewayId": {
+                    "Ref": "NatGatewayB"
+                }
+            }
+        },
+        "InternetGateway": {
+            "Type": "AWS::EC2::InternetGateway",
+            "Properties": {
+                "Tags": []
+            }
+        },
+        "AttachInternetGateway": {
+            "Type": "AWS::EC2::VPCGatewayAttachment",
+            "Properties": {
+                "VpcId": {
+                    "Ref": "Vpc"
+                },
+                "InternetGatewayId": {
+                    "Ref": "InternetGateway"
+                }
+            }
+        },
+        "NatZoneAEip": {
+            "Type": "AWS::EC2::EIP",
+            "Properties": {
+                "Domain": "vpc",
+                "Tags": []
+            }
+        },
+        "NatGatewayA": {
+            "Type": "AWS::EC2::NatGateway",
+            "Properties": {
+                "AllocationId": {
+                    "Fn::GetAtt": [
+                        "NatZoneAEip",
+                        "AllocationId"
+                    ]
+                },
+                "SubnetId": {
+                    "Ref": "DmzSubnetA"
+                },
+                "Tags": []
+            }
+        },
+        "NatZoneBEip": {
+            "Type": "AWS::EC2::EIP",
+            "Properties": {
+                "Domain": "vpc",
+                "Tags": []
+            }
+        },
+        "NatGatewayB": {
+            "Type": "AWS::EC2::NatGateway",
+            "Properties": {
+                "AllocationId": {
+                    "Fn::GetAtt": [
+                        "NatZoneBEip",
+                        "AllocationId"
+                    ]
+                },
+                "SubnetId": {
+                    "Ref": "DmzSubnetB"
+                },
+                "Tags": []
+            }
+        },
+        "VpcFlowLogsIamRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": "vpc-flow-logs.amazonaws.com"
+                            },
+                            "Action": "sts:AssumeRole"
+                        }
+                    ]
+                },
+                "Path": "/",
+                "Policies": [
+                    {
+                        "PolicyName": "AllowCloudWatchLogsAccess",
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Action": [
+                                        "logs:CreateLogGroup",
+                                        "logs:CreateLogStream",
+                                        "logs:PutLogEvents",
+                                        "logs:DescribeLogGroups",
+                                        "logs:DescribeLogStreams"
+                                    ],
+                                    "Effect": "Allow",
+                                    "Resource": "*"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        "FlowLogsVpc": {
+            "Type": "AWS::EC2::FlowLog",
+            "Properties": {
+                "DeliverLogsPermissionArn": {
+                    "Fn::GetAtt": [
+                        "VpcFlowLogsIamRole",
+                        "Arn"
+                    ]
+                },
+                "LogGroupName": {
+                    "Fn::Sub": "flowlogs"
+                },
+                "LogDestinationType": "cloud-watch-logs",
+                "ResourceId": {
+                    "Ref": "Vpc"
+                },
+                "ResourceType": "VPC",
+                "TrafficType": "ALL"
+            }
+        }
+    },
+    "Outputs": {
+        "VpcId": {
+            "Description": "VPC ID",
+            "Value": {"Ref": "Vpc"},
+            "Export": {
+                "Name": {"Fn::Sub": "${AWS::StackName}-VpcId"}
+            }
+        },
+        "DmzSubnetAId": {
+            "Description": "DMZ Subnet A ID",
+            "Value": {"Ref": "DmzSubnetA"},
+            "Export": {
+                "Name": {"Fn::Sub": "${AWS::StackName}-DmzSubnetAId"}
+            }
+        },
+        "DmzSubnetBId": {
+            "Description": "DMZ Subnet B ID",
+            "Value": {"Ref": "DmzSubnetB"},
+            "Export": {
+                "Name": {"Fn::Sub": "${AWS::StackName}-DmzSubnetBId"}
+            }
+        },
+        "ExtLbSubnetAId": {
+            "Description": "External Load Balancer Subnet A ID",
+            "Value": {"Ref": "ExtLbSubnetA"},
+            "Export": {
+                "Name": {"Fn::Sub": "${AWS::StackName}-ExtLbSubnetAId"}
+            }
+        },
+        "ExtLbSubnetBId": {
+            "Description": "External Load Balancer Subnet B ID",
+            "Value": {"Ref": "ExtLbSubnetB"},
+            "Export": {
+                "Name": {"Fn::Sub": "${AWS::StackName}-ExtLbSubnetBId"}
+            }
+        },
+        "WebSubnetAId": {
+            "Description": "Web Subnet A ID",
+            "Value": {"Ref": "WebSubnetA"},
+            "Export": {
+                "Name": {"Fn::Sub": "${AWS::StackName}-WebSubnetAId"}
+            }
+        },
+        "WebSubnetBId": {
+            "Description": "Web Subnet B ID",
+            "Value": {"Ref": "WebSubnetB"},
+            "Export": {
+                "Name": {"Fn::Sub": "${AWS::StackName}-WebSubnetBId"}
+            }
+        },
+        "AppSubnetAId": {
+            "Description": "App Subnet A ID",
+            "Value": {"Ref": "AppSubnetA"},
+            "Export": {
+                "Name": {"Fn::Sub": "${AWS::StackName}-AppSubnetAId"}
+            }
+        },
+        "AppSubnetBId": {
+            "Description": "App Subnet B ID",
+            "Value": {"Ref": "AppSubnetB"},
+            "Export": {
+                "Name": {"Fn::Sub": "${AWS::StackName}-AppSubnetBId"}
+            }
+        },
+        "DataSubnetAId": {
+            "Description": "Data Subnet A ID",
+            "Value": {"Ref": "DataSubnetA"},
+            "Export": {
+                "Name": {"Fn::Sub": "${AWS::StackName}-DataSubnetAId"}
+            }
+        },
+        "DataSubnetBId": {
+            "Description": "Data Subnet B ID",
+            "Value": {"Ref": "DataSubnetB"},
+            "Export": {
+                "Name": {"Fn::Sub": "${AWS::StackName}-DataSubnetBId"}
+            }
+        }
+    }
+}
