@@ -149,12 +149,16 @@
                             "\n",
                             [
                                 "#!/bin/bash -xe",
+                                "amazon-linux-extras install epel -y",
                                 "yum update -y",
                                 "amazon-linux-extras install nginx1 -y",
                                 "echo \"<html><body><h2>Hello World! From $(curl -s http://169.254.169.254/latest/meta-data/local-hostname)</h2></body></html>\" > /tmp/index.html",
                                 "rm /usr/share/nginx/html/index.html",
                                 "cp /tmp/index.html /usr/share/nginx/html/index.html",
-                                "service nginx restart"
+                                "service nginx restart",
+                                "yum install stress -y",
+                                "yum install -y aws-cfn-bootstrap",
+                                {"Fn::Sub": "/opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource Asg --region ${AWS::Region}"}
                             ]
                         ]
                     }
@@ -192,6 +196,19 @@
                         "Ref": "AsgTargetGroup"
                     }
                 ]
+            },
+            "UpdatePolicy": {
+                "AutoScalingRollingUpdate": {
+                    "MinInstancesInService": "1",
+                    "MaxBatchSize": "1",
+                    "WaitOnResourceSignals": "true",
+                    "PauseTime": "PT10M"
+                }
+            },
+            "CreationPolicy": {
+                "ResourceSignal": {
+                    "Timeout": "PT5M"
+                }
             }
         },
         "AsgTargetGroup": {
