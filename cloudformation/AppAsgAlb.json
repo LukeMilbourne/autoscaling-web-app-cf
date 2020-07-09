@@ -232,5 +232,10 @@
             }
         }
     },
-    "Outputs": {}
+    "Outputs": {
+        "AlbDnsName": {
+            "Description": "Load Balancer DNS Name",
+            "Value": {"Fn::GetAtt": ["Alb", "DNSName"]}
+        }
+    }
 }
