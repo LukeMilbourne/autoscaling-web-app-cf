@@ -152,7 +152,7 @@
                                 "amazon-linux-extras install epel -y",
                                 "yum update -y",
                                 "amazon-linux-extras install nginx1 -y",
-                                "echo \"<html><body><h2>Hello World! From $(curl -s http://169.254.169.254/latest/meta-data/local-hostname)</h2></body></html>\" > /tmp/index.html",
+                                "echo \"<html><body><h2>Hello World!</h2><p>From $(curl -s http://169.254.169.254/latest/meta-data/local-hostname)</p></body></html>\" > /tmp/index.html",
                                 "rm /usr/share/nginx/html/index.html",
                                 "cp /tmp/index.html /usr/share/nginx/html/index.html",
                                 "service nginx restart",
