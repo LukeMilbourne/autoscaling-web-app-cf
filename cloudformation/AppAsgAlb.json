@@ -144,16 +144,19 @@
                     }
                 ],
                 "UserData": {
-                    "Fn::Base64" : {
-                        "Fn::Join" : [ "\n", [
-                            "#!/bin/bash -xe",
-                            "yum update -y",
-                            "amazon-linux-extras install nginx1 -y",
-                            "echo \"<html><body><h2>Hello World! From $(curl -s http://169.254.169.254/latest/meta-data/local-hostname)</h2></body></html>\" > /tmp/index.html",
-                            "rm /usr/share/nginx/html/index.html",
-                            "cp /tmp/index.html /usr/share/nginx/html/index.html",
-                            "service nginx restart"
-                            ]]
+                    "Fn::Base64": {
+                        "Fn::Join": [
+                            "\n",
+                            [
+                                "#!/bin/bash -xe",
+                                "yum update -y",
+                                "amazon-linux-extras install nginx1 -y",
+                                "echo \"<html><body><h2>Hello World! From $(curl -s http://169.254.169.254/latest/meta-data/local-hostname)</h2></body></html>\" > /tmp/index.html",
+                                "rm /usr/share/nginx/html/index.html",
+                                "cp /tmp/index.html /usr/share/nginx/html/index.html",
+                                "service nginx restart"
+                            ]
+                        ]
                     }
                 }
             }
@@ -230,12 +233,91 @@
                     }
                 ]
             }
+        },
+        "AsgScaleUpPolicy": {
+            "Type": "AWS::AutoScaling::ScalingPolicy",
+            "Properties": {
+                "AdjustmentType": "ChangeInCapacity",
+                "AutoScalingGroupName": {
+                    "Ref": "Asg"
+                },
+                "Cooldown": "60",
+                "ScalingAdjustment": "1"
+            }
+        },
+        "AsgScaleDownPolicy": {
+            "Type": "AWS::AutoScaling::ScalingPolicy",
+            "Properties": {
+                "AdjustmentType": "ChangeInCapacity",
+                "AutoScalingGroupName": {
+                    "Ref": "Asg"
+                },
+                "Cooldown": "60",
+                "ScalingAdjustment": "-1"
+            }
+        },
+        "AsgCPUAlarmHigh": {
+            "Type": "AWS::CloudWatch::Alarm",
+            "Properties": {
+                "EvaluationPeriods": "1",
+                "Statistic": "Average",
+                "Threshold": "60",
+                "AlarmDescription": "Autoscaling Group CPU alarm",
+                "Period": "60",
+                "AlarmActions": [
+                    {
+                        "Ref": "AsgScaleUpPolicy"
+                    }
+                ],
+                "Namespace": "AWS/EC2",
+                "Dimensions": [
+                    {
+                        "Name": "AutoScalingGroupName",
+                        "Value": {
+                            "Ref": "Asg"
+                        }
+                    }
+                ],
+                "ComparisonOperator": "GreaterThanThreshold",
+                "MetricName": "CPUUtilization"
+            }
+        },
+        "AsgCPUAlarmLow": {
+            "Type": "AWS::CloudWatch::Alarm",
+            "Properties": {
+                "EvaluationPeriods": "1",
+                "Statistic": "Average",
+                "Threshold": "30",
+                "AlarmDescription": "Autoscaling Group CPU alarm",
+                "Period": "60",
+                "AlarmActions": [
+                    {
+                        "Ref": "AsgScaleDownPolicy"
+                    }
+                ],
+                "Namespace": "AWS/EC2",
+                "Dimensions": [
+                    {
+                        "Name": "AutoScalingGroupName",
+                        "Value": {
+                            "Ref": "Asg"
+                        }
+                    }
+                ],
+                "ComparisonOperator": "LessThanThreshold",
+                "MetricName": "CPUUtilization"
+            }
         }
     },
     "Outputs": {
         "AlbDnsName": {
             "Description": "Load Balancer DNS Name",
-            "Value": {"Fn::GetAtt": ["Alb", "DNSName"]}
+            "Value": {
+                "Fn::GetAtt": [
+                    "Alb",
+                    "DNSName"
+                ]
+            }
         }
     }
 }
